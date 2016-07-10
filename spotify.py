@@ -32,58 +32,28 @@ WINDOW_SIZE = 8
 # text = list(map(lambda x: x[0].upper() + x[1:], text))
 # parts = pos_tag(text)
 
-sentence = "have you heard Justin Biebers new album"
-parts = pos_tag(sentence.split(" "))
-print parts
-propernouns = [word for word,pos in parts if pos == 'NNP']
-print propernouns
+sentence = "oh by the way, have you heard Justin Biebers new album. i heard its really good"
 
-#celebrities or popular songs usually have wikipedia articles
-queryurl = "https://www.google.com/search?q=wikipedia+"
-for word in propernouns:
-    queryurl = queryurl + word + '+' #"%20"
-    
+spotifySentence = "have you heard Justin Biebers new album"
+
+spotifySentence = "spotify " + spotifySentence
+queryurl = "https://www.google.com/search?q=" + spotifySentence
 if queryurl[-1] == '+':
     queryurl = queryurl[:-1]
 print queryurl
 r = requests.get(queryurl)
 soup = BeautifulSoup(r.text, 'html.parser')
-h3 = str(soup('h3')[0])
-print(h3.__repr__)
-before = 'href="/url?q='
-index = h3.find(before)
-url = h3[index + len(before):].split('&amp')[0]
-print url
-newrequest  = requests.get(url)
-newsoup = BeautifulSoup(newrequest.text, 'html.parser')
-name =  str(newsoup.title.string)
-print name
-name = name.split(' -')[0]
-print name
-namearray = name.split(" ");
-print namearray
-spotifyurl = "https://api.spotify.com/v1/search?query="
-for word in namearray:
-    spotifyurl = spotifyurl + word + '+' #"%20"
-spotifyurl = spotifyurl + "&type=track"
-print spotifyurl
-
-spotifyrequest = requests.get(spotifyurl)
-spotifysoup = BeautifulSoup(spotifyrequest.text)
-#print spotifysoup
-spotifystr = str(spotifysoup)
-print spotifystr
-before = 'https://open.spotify.com/track/'
-index = spotifystr.find(before)
-print index
-trackurl = spotifystr[index + len(before):].split('"')[0]
-trackurl = 'https://open.spotify.com/track/' + trackurl
-print trackurl
-#for the above sentence, we get https://open.spotify.com/track/3eze1OsZ1rqeXkKStNfTmi
-
-
-
-
+openSpotifyLinkFound = 0
+numh3 = 0
+while openSpotifyLinkFound ==0:
+    h3 = str(soup('h3')[numh3])
+    before = 'href="/url?q=https://open.spotify.com'
+    index = h3.find(before)
+    if index != -1:
+        spotifyurl = "https://open.spotify.com" + h3[index + len(before):].split('&amp')[0]
+        print spotifyurl
+        openSpotifyLinkFound = 1
+    numh3 = numh3+1
 
 
 
