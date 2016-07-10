@@ -1,10 +1,26 @@
 from bs4 import BeautifulSoup
 import requests
 import sys
+import json
 
-#imput url = first website after google searching nltk query output
+from BeautifulSoup import BeautifulSoup
 
-url = "http://www.yelp.com/biz/five-guys-burgers-and-fries-alexandria-5"
+nltk_data_path = "nltk_data.txt"
+
+nltk_data = []
+nltk_file = open(nltk_data_path, "r")
+for line in nltk_file:
+    try:
+        word = json.loads(line)
+        nltk_data.append(word['text'])
+    except:
+        continue
+queryurl = "https://www.google.com/#q="
+for word in nltk_data:
+	queryurl = queryurl + word + "%20"
+
+url = queryurl
+
 def compute(url):
 	# Computation
 	r  = requests.get(url)
