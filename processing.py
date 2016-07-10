@@ -10,10 +10,15 @@ from bs4 import BeautifulSoup
 import requests
 import urllib.request
 
+import resource
+
+rsrc = resource.RLIMIT_DATA
+soft, hard = resource.getrlimit(rsrc)
+resource.setrlimit(rsrc, (1024*1024*500, hard))
 
 keep = set(['CD', 'NN', 'NNP', 'NNPS', 'NNS'])
 keywords = ['yelp']
-WINDOW_SIZE = 6
+WINDOW_SIZE = 8
 
 # # sentence= 'i want to look up five guys on yelp, oh my phone can'
 # sentence = "oh going to san diego. i wonder what the weather is like"
@@ -42,9 +47,6 @@ def stripExceptNouns(sentence):
         if part[1]  in keep:
             kept.append(part[0])
     return kept
-    
-
-
 
 
 def getGoogleWords(words):
@@ -209,12 +211,19 @@ def getWords(line):
     g = getGoogleWords(stripped)
     # print(g)
     words = findOverlap(' '.join(stripped),g)
-    words.remove(keyword)
-    if keyword == 'yelp':
-        return 'http://www.yelp.com/search?find_desc=' + '+'.join(words)
+    while keyword in words:
+        words.remove(keyword)
+    return getUrl(words, keyword)
+    # if keyword == 'yelp':
+    #     return 'http://www.yelp.com/search?find_desc=' + '+'.join(words)
 
     # return findOverlap(' '.join(stripped),g)
     # print(sample, stripExceptNouns(sample))
+
+def getUrl(words, keyword):
+    if keyword == 'yelp':
+        return 'http://www.yelp.com/search?find_desc=' + '+'.join(words)
+
 
 
 
