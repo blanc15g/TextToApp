@@ -3,29 +3,24 @@ import requests
 import sys
 import json
 
-from BeautifulSoup import BeautifulSoup
+#from BeautifulSoup import BeautifulSoup
 
-nltk_data_path = "nltk_data.txt"
 
-nltk_data = []
-nltk_file = open(nltk_data_path, "r")
-for line in nltk_file:
-    try:
-        word = json.loads(line)
-        nltk_data.append(word['text'])
-    except:
-        continue
-queryurl = "https://www.google.com/#q="
-for word in nltk_data:
-	queryurl = queryurl + word + "%20"
-
-url = queryurl
+url = "https://www.google.com/search?q=cost+uber+googleplex"
 
 def compute(url):
 	# Computation
 	r  = requests.get(url)
-	soup = BeautifulSoup(r.text)
+	soup = BeautifulSoup(r.text, "html.parser")
 	print soup.title
 	print soup.title.string
+	#print soup.first('p').string
+	print soup('h3')[1].extract()
+	mystr = str(soup('h3')[1].extract())
+	print mystr.split("url?q=")
+	#print soup('h3')[0]['class']
+	print "hi"
 
 	return soup.title.string
+
+compute(url)
